@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import User from './user.entity';
+import { User } from './user.entity';
 import * as bcrypt from 'bcrypt';
 import UserDto from './user.dto';
  
@@ -20,7 +20,7 @@ export class UserService {
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
-  async getByEmail(email: string) {
+  async findUser(email: string) {
     const user = await this.usersRepository.findOne({ email });
     if (user) {
       return user;
@@ -29,8 +29,9 @@ export class UserService {
   }
  
   async register(userData: UserDto) {
+    const saltRounds = 10;
     try{
-      const hashPassword = await bcrypt.hash(userData.password,10);
+      const hashPassword = await bcrypt.hash(userData.password,saltRounds);
       userData.password = hashPassword;
       const newUser = await this.usersRepository.create(userData);
       await this.usersRepository.save(newUser);
