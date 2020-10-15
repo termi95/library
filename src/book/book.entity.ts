@@ -5,12 +5,15 @@ export class Book {
     @PrimaryGeneratedColumn() 
     id: number;
 
-    @Column() 
+    @Column({ unique: true, length: 64 }) 
     name: string;
 
     @Column() 
     descryption: string;
 
-    @Column() 
+    @Column({ unique: true, length: 32 }) 
     author: string;
+
+    @Column() 
+    quantity: number;
 }
