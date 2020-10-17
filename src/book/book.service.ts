@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Book } from './book.entity';
+import { Book } from './entity/book.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BookDto } from './book.dto';
@@ -28,10 +28,13 @@ export class BookService {
         }
     }
 
-    async addBook(bookDetails:BookDto) {
+    async addBook(bookDetails:BookDto, userId) {
         const book = this.bookRepository.create(bookDetails);
-        this.bookRepository.save(book);
+        book.personWhoAdded = userId;
+        book.addedDate = new Date(Date.now());
+
         try {
+            this.bookRepository.save(book);
             return await book;            
         } catch (error) {
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);

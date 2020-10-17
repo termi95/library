@@ -8,4 +8,6 @@ export class BookDto {
     descryption: string;
     @IsString()
     author: string;
+    @IsInt()
+    quantity: number;
 }
