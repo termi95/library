@@ -24,4 +24,7 @@ export class BookBorrow {
     
     @Column({default:false})
     isReturn:boolean
+
+    @Column({default:false})
+    isTimeToReturnWasExtended:boolean
 }

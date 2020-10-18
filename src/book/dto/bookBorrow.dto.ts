@@ -13,6 +13,8 @@ export class BookBorrowDto {
     bill: number;
     @IsBoolean()
     isReturn:boolean;
+    @IsBoolean()
+    isTimeToReturnWasExtended: boolean;
 }
 
 export interface BookBorrowInterface {

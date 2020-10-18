@@ -8,6 +8,8 @@ import { toDate, format, add } from 'date-fns';
 
 @Injectable()
 export class BookService {
+    EXTENDET_TIME = 7;
+    ALLOWED_TIME_TO_BORROW = 14;
 
     constructor(
         @InjectRepository(Book) 
@@ -71,7 +73,7 @@ export class BookService {
                 borrowInf.bookThatWasBorrow = idOfBorrowedBook;
                 borrowInf.personWhoBorrow = userId;
                 borrowInf.borrowDate = new Date(Date.now());
-                borrowInf.returnDate = add(new Date(Date.now()),{days:14});
+                borrowInf.returnDate = add(new Date(Date.now()),{days:this.ALLOWED_TIME_TO_BORROW});
                 this.bookBorrowRepository.save(borrowInf)
 
                 bookToBorrow.quantity = bookToBorrow.quantity.valueOf() - 1;
@@ -90,5 +92,19 @@ export class BookService {
         } catch (error) {
             throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    async extendBookBorrow(borrowedBookDetail, userId){
+        const bookWelooking = this.bookBorrowRepository.create();
+        bookWelooking.personWhoBorrow = userId;
+        bookWelooking.isTimeToReturnWasExtended = false;
+        bookWelooking.isReturn = false;
+        bookWelooking.bookThatWasBorrow = borrowedBookDetail;
+
+        const borrowedBook = this.bookBorrowRepository.findOne(bookWelooking);
+        (await borrowedBook).isTimeToReturnWasExtended = true;
+        (await borrowedBook).returnDate = add((await borrowedBook).returnDate,{days:this.EXTENDET_TIME});
+        this.bookBorrowRepository.update((await borrowedBook).id,(await borrowedBook));
+        return (await borrowedBook);
     }
 }

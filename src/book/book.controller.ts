@@ -43,4 +43,10 @@ export class BookController {
     async borrowBook(@UserObj() user: UserBasicInf, @Body() bookId: BookBorrowInterface) {
         return await this.BookService.borrowBook(bookId.idOfBorrowedBook, user.id);
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('/extend-book-borrow')    
+    async extendBookBorrow(@UserObj() user: UserBasicInf, @Body() bookId: BookBorrowInterface) {
+        return await this.BookService.extendBookBorrow(bookId.idOfBorrowedBook, user.id);
+    }
 }
