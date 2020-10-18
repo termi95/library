@@ -7,5 +7,6 @@ export const config: TypeOrmModuleOptions = {
     host: '127.0.0.1',
     database: 'library',
     synchronize: true,
+    //logging: true,
     entities: ["dist/**/*.entity{.ts,.js}"],
 };

@@ -7,18 +7,21 @@ export class BookBorrow {
     @PrimaryGeneratedColumn() 
     id: number;
     
-    @ManyToOne(type => User, user => user.id)
+    @ManyToOne(type => User, user => user.id, {nullable:false})
     personWhoBorrow: number;
 
-    @ManyToOne(type => Book, book => book.id)
-    boolThawWasBorrow: number;
+    @ManyToOne(type => Book, book => book.id, {nullable:false})
+    bookThatWasBorrow: number;
 
-    @Column()
+    @Column({nullable:false})
     borrowDate: Date;
 
-    @Column()
+    @Column({nullable:false})
     returnDate: Date;
 
-    @Column({ type: "decimal", precision: 4})
+    @Column({ type: "decimal", precision: 4, default:0})
     bill: number
+    
+    @Column({default:false})
+    isReturn:boolean
 }
