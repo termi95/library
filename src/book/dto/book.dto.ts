@@ -1,4 +1,4 @@
-import { IsDate, IsInt, IsString } from 'class-validator';
+import { IsBoolean, IsDate, IsInt, IsString } from 'class-validator';
 
 export class BookDto implements BasicBookInf {
     @IsInt()
@@ -9,16 +9,16 @@ export class BookDto implements BasicBookInf {
     @IsString()
     author: string;
     @IsInt()
-    quantity: number;
-    @IsInt()
     personWhoLastEdit
     @IsDate()
     lastEditDate
+    @IsBoolean()
+    available
 }
 
 export interface BasicBookInf {
     name: string;
     descryption: string;
     author: string;
-    quantity: number;
+    available: boolean;
 }

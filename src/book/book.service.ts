@@ -68,15 +68,15 @@ export class BookService {
     async borrowBook(idOfBorrowedBook, userId) {
         try {
             const borrowInf = this.bookBorrowRepository.create();
-            const bookToBorrow = (await this.amountOfbook(idOfBorrowedBook));      
-            if( bookToBorrow.quantity > 0){
+            const bookToBorrow = (await this.bookIsAvailable(idOfBorrowedBook));      
+            if( bookToBorrow.available){
                 borrowInf.bookThatWasBorrow = idOfBorrowedBook;
                 borrowInf.personWhoBorrow = userId;
                 borrowInf.borrowDate = new Date(Date.now());
                 borrowInf.returnDate = add(new Date(Date.now()),{days:this.ALLOWED_TIME_TO_BORROW});
                 this.bookBorrowRepository.save(borrowInf)
-
-                bookToBorrow.quantity = bookToBorrow.quantity.valueOf() - 1;
+                
+                bookToBorrow.available = false;
                 this.bookRepository.update(idOfBorrowedBook,bookToBorrow);
             }
             return await borrowInf;        
@@ -85,7 +85,7 @@ export class BookService {
         }       
     }
 
-    async amountOfbook(idOfBorrowedBook): Promise<Book> {
+    async bookIsAvailable(idOfBorrowedBook): Promise<Book> {
         try {                
             const book = await this.bookRepository.findOne(idOfBorrowedBook);
             return book;         
@@ -97,14 +97,19 @@ export class BookService {
     async extendBookBorrow(borrowedBookDetail, userId){
         const bookWelooking = this.bookBorrowRepository.create();
         bookWelooking.personWhoBorrow = userId;
-        bookWelooking.isTimeToReturnWasExtended = false;
         bookWelooking.isReturn = false;
         bookWelooking.bookThatWasBorrow = borrowedBookDetail;
-
-        const borrowedBook = this.bookBorrowRepository.findOne(bookWelooking);
-        (await borrowedBook).isTimeToReturnWasExtended = true;
-        (await borrowedBook).returnDate = add((await borrowedBook).returnDate,{days:this.EXTENDET_TIME});
-        this.bookBorrowRepository.update((await borrowedBook).id,(await borrowedBook));
-        return (await borrowedBook);
+        try {
+            const borrowedBook = this.bookBorrowRepository.findOneOrFail(bookWelooking);
+            if((await borrowedBook).isTimeToReturnWasExtended =! true){
+                (await borrowedBook).isTimeToReturnWasExtended = true;
+                (await borrowedBook).returnDate = add((await borrowedBook).returnDate,{days:this.EXTENDET_TIME});
+                this.bookBorrowRepository.update((await borrowedBook).id,(await borrowedBook));            
+                return (await borrowedBook);                
+            }
+            return {'status':'time was extended and you can not extend it more'}
+        } catch (error) {
+            throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

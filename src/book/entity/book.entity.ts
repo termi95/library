@@ -14,15 +14,15 @@ export class Book {
 
     @Column({ unique: true, length: 32, nullable: false }) 
     author: string;
-
-    @Column({nullable: false}) 
-    quantity: number;
     
     @Column({ type: 'date' })
     addedDate: Date;
 
     @Column({nullable: true, default: null})
     lastEditDate: Date | null;
+
+    @Column({default: true})
+    available: boolean
 
     @ManyToOne(type => User, user => user.id, {nullable: false})
     personWhoAdded: number;
